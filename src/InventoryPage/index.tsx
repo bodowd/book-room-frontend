@@ -34,6 +34,19 @@ export const InventoryPage = () => {
     setBooksList(newBooksList);
   };
 
+  const filterBooks = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    const newBooksList = booksList.filter((i) => i.title.includes(query));
+    setBooksList(newBooksList);
+    setQuery("");
+  };
+
+  const resetBooksList = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    setBooksList(books);
+    setQuery("");
+  };
+
   const showOnlyUpdateButton = () => {
     setShowAddBookButton(!showAddBookButton);
     setShowDeleteBookButton(!showDeleteBookButton);
@@ -56,6 +69,7 @@ export const InventoryPage = () => {
     React.useState<boolean>(true);
   const [showDeleteBookButton, setShowDeleteBookButton] =
     React.useState<boolean>(true);
+  const [query, setQuery] = React.useState<string>("");
 
   // React.useEffect(() => {
   //   const importedBooks = books;
@@ -101,6 +115,17 @@ export const InventoryPage = () => {
       ) : (
         <div></div>
       )}
+
+      <div>
+        <form onSubmit={filterBooks} onReset={resetBooksList}>
+          <input
+            value={query}
+            onChange={({ target }) => setQuery(target.value)}
+          />
+          <button type="submit">Search for book</button>
+          <button type="reset">Reset</button>
+        </form>
+      </div>
 
       <BookTable booksList={booksList} />
     </div>
