@@ -13,14 +13,21 @@ export const InventoryPage = () => {
     setBooksList(booksList.concat(newBook));
   };
 
-  const editBook = (entry: BookEntry) => {
+  const updateBook = (entry: BookEntry) => {
     const bookOfInterest = booksList.filter(
       (i) => Number(i.id) === Number(entry.id)
     );
+
+    // check to see that the id is actually found
+    if (bookOfInterest.length !== 0) {
+      const newBooksList = booksList.filter(
+        (i) => Number(i.id) !== Number(entry.id)
+      );
+      setBooksList(newBooksList.concat(entry));
+    }
   };
 
   const deleteBook = (entry: { id: number }) => {
-    console.log(Number(entry.id));
     const newBooksList = booksList.filter(
       (i) => Number(i.id) !== Number(entry.id)
     );
@@ -77,7 +84,7 @@ export const InventoryPage = () => {
           cancelButtonLabel="Close updating books form"
           setHideOthers={showOnlyUpdateButton}
         >
-          <BookForm mutateBook={editBook} formType={"update"} />
+          <BookForm mutateBook={updateBook} formType={"update"} />
         </Togglable>
       ) : (
         <div></div>
