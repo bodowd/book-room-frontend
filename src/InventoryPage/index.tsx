@@ -1,32 +1,10 @@
 import React from "react";
+import { BookForm } from "../components/BookForm/BookForm";
+import { BookTable } from "../components/BookTable/BookTable";
+import { Togglable } from "../components/Togglable/Togglable";
 import { books } from "../data/books";
-import {
-  DataGrid,
-  GridColDef,
-  GridPreProcessEditCellProps,
-} from "@mui/x-data-grid";
-
-interface BookEntry {
-  id: number;
-  title: string;
-  count: number;
-  price: number;
-}
-
-const isNumbersOnly = (e: string) => {
-  const re = /^[0-9.\b]+$/;
-  return re.test(e);
-};
-
-const numbersOnlyOnChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  setState: Function
-) => {
-  // checks to see if the entered values are numbers (allows floats)
-  if (e.target.value === "" || isNumbersOnly(e.target.value)) {
-    setState(e.target.value);
-  }
-};
+import { BookEntry } from "../types";
+import "./inventory.css";
 
 export const InventoryPage = () => {
   const addBook = (entry: BookEntry) => {
@@ -35,91 +13,83 @@ export const InventoryPage = () => {
     setBooksList(booksList.concat(newBook));
   };
 
-  const handleSubmit = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    addBook({
-      id: 0,
-      title: newBookTitle,
-      count: newBookCount,
-      price: newBookPrice,
-    });
-    setNewBookTitle("");
-    setNewBookCount(0);
-    setNewBookPrice(0);
+  const editBook = (entry: BookEntry) => {
+    const bookOfInterest = booksList.filter(
+      (i) => Number(i.id) === Number(entry.id)
+    );
   };
 
-  const [booksList, setBooksList] = React.useState<BookEntry[]>([]);
+  const deleteBook = (entry: BookEntry) => {};
 
-  const [newBookTitle, setNewBookTitle] = React.useState<string>("");
-  const [newBookCount, setNewBookCount] = React.useState<number>(0);
-  const [newBookPrice, setNewBookPrice] = React.useState<number>(0);
+  const showOnlyUpdateButton = () => {
+    setShowAddBookButton(!showAddBookButton);
+    setShowDeleteBookButton(!showDeleteBookButton);
+  };
 
-  React.useEffect(() => {
-    const importedBooks = books;
-    setBooksList(importedBooks);
-  }, []);
+  const showOnlyAddButton = () => {
+    setShowDeleteBookButton(!showDeleteBookButton);
+    setShowUpdateBookButton(!showUpdateBookButton);
+  };
 
-  const columns: GridColDef[] = [
-    { field: "title", headerName: "Title", flex: 1, editable: true },
-    {
-      field: "count",
-      headerName: "Count",
-      flex: 1,
-      editable: true,
-      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        // don't allow the cell to be edited if there are letters in there
-        const hasError = !isNumbersOnly(params.props.value);
-        return { ...params.props, error: hasError };
-      },
-    },
-    {
-      field: "price",
-      headerName: "Price in €",
-      flex: 1,
-      editable: true,
-      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        // don't allow the cell to be edited if there are letters in there
-        const hasError = !isNumbersOnly(params.props.value);
-        return { ...params.props, error: hasError };
-      },
-    },
-  ];
+  const showOnlyDeleteButton = () => {
+    setShowAddBookButton(!showAddBookButton);
+    setShowUpdateBookButton(!showUpdateBookButton);
+  };
+
+  const [booksList, setBooksList] = React.useState<BookEntry[]>(books);
+  const [showAddBookButton, setShowAddBookButton] =
+    React.useState<boolean>(true);
+  const [showUpdateBookButton, setShowUpdateBookButton] =
+    React.useState<boolean>(true);
+  const [showDeleteBookButton, setShowDeleteBookButton] =
+    React.useState<boolean>(true);
+
+  // React.useEffect(() => {
+  //   const importedBooks = books;
+  //   setBooksList(importedBooks);
+  // }, []);
 
   return (
     <div>
       <h1>Book Room Inventory</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          Title:
-          <input
-            value={newBookTitle}
-            onChange={({ target }) => setNewBookTitle(target.value)}
-          />
-        </div>
-        <div>
-          Count:
-          <input
-            value={newBookCount}
-            onChange={(event) => numbersOnlyOnChange(event, setNewBookCount)}
-          />
-        </div>
-        <div>
-          Price (€):
-          <input
-            value={newBookPrice}
-            onChange={(event) => numbersOnlyOnChange(event, setNewBookPrice)}
-          />
-        </div>
-        <button type="submit">Add Book</button>
-      </form>
-      <div style={{ flexGrow: 1 }}>
-        <DataGrid
-          rows={booksList}
-          columns={columns}
-          autoHeight
-          experimentalFeatures={{ newEditingApi: true }}
-        />
-      </div>
+
+      {showAddBookButton ? (
+        <Togglable
+          buttonLabel="Add a new book"
+          cancelButtonLabel="Close adding books form"
+          setHideOthers={showOnlyAddButton}
+        >
+          <BookForm mutateBook={addBook} formType={"add"} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
+
+      {showUpdateBookButton ? (
+        <Togglable
+          buttonLabel="Update a book"
+          cancelButtonLabel="Close updating books form"
+          setHideOthers={showOnlyUpdateButton}
+        >
+          <BookForm mutateBook={editBook} formType={"update"} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
+
+      {showDeleteBookButton ? (
+        <Togglable
+          buttonLabel="Delete a book"
+          cancelButtonLabel="Close deleting books form"
+          setHideOthers={showOnlyDeleteButton}
+        >
+          <BookForm mutateBook={deleteBook} formType={"delete"} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
+
+      <BookTable booksList={booksList} />
     </div>
   );
 };
