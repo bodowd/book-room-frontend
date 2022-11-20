@@ -1,5 +1,5 @@
 import React from "react";
-import { AddBookForm } from "../components/AddBookForm/AddBookForm";
+import { BookForm } from "../components/BookForm/BookForm";
 import { BookTable } from "../components/BookTable/BookTable";
 import { Togglable } from "../components/Togglable/Togglable";
 import { books } from "../data/books";
@@ -13,7 +13,21 @@ export const InventoryPage = () => {
     setBooksList(booksList.concat(newBook));
   };
 
+  const editBook = (entry: BookEntry) => {};
+
+  const hideAddBookButton = () => {
+    setShowAddBookButton(!showAddBookButton);
+  };
+
+  const hideUpdateBookButton = () => {
+    setShowUpdateBookButton(!showUpdateBookButton);
+  };
+
   const [booksList, setBooksList] = React.useState<BookEntry[]>(books);
+  const [showAddBookButton, setShowAddBookButton] =
+    React.useState<boolean>(true);
+  const [showUpdateBookButton, setShowUpdateBookButton] =
+    React.useState<boolean>(true);
 
   // React.useEffect(() => {
   //   const importedBooks = books;
@@ -23,12 +37,30 @@ export const InventoryPage = () => {
   return (
     <div>
       <h1>Book Room Inventory</h1>
-      <Togglable
-        buttonLabel="Add a new book"
-        cancelButtonLabel="Close adding books"
-      >
-        <AddBookForm addBook={addBook} />
-      </Togglable>
+
+      {showAddBookButton ? (
+        <Togglable
+          buttonLabel="Add a new book"
+          cancelButtonLabel="Close adding books form"
+          setHideOthers={hideUpdateBookButton}
+        >
+          <BookForm mutateBook={addBook} isAddBook={true} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
+
+      {showUpdateBookButton ? (
+        <Togglable
+          buttonLabel="Update a book"
+          cancelButtonLabel="Close updating books form"
+          setHideOthers={hideAddBookButton}
+        >
+          <BookForm mutateBook={editBook} isAddBook={false} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
 
       <BookTable booksList={booksList} />
     </div>

@@ -1,14 +1,15 @@
 import React from "react";
 import { numbersOnlyOnChange } from "../utils";
 
-interface AddBookFormProps {
-  addBook: Function;
+interface BookFormProps {
+  mutateBook: Function;
+  isAddBook: boolean;
 }
 
-export const AddBookForm = ({ addBook }: AddBookFormProps) => {
+export const BookForm = (props: BookFormProps) => {
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    addBook({
+    props.mutateBook({
       id: 0,
       title: newBookTitle,
       count: newBookCount,
@@ -19,6 +20,7 @@ export const AddBookForm = ({ addBook }: AddBookFormProps) => {
     setNewBookPrice(0);
   };
 
+  const [bookId, setBookId] = React.useState<number | string>(0);
   const [newBookTitle, setNewBookTitle] = React.useState<string>("");
   const [newBookCount, setNewBookCount] = React.useState<number>(0);
   const [newBookPrice, setNewBookPrice] = React.useState<number>(0);
@@ -26,6 +28,17 @@ export const AddBookForm = ({ addBook }: AddBookFormProps) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
+        {!props.isAddBook ? (
+          <div>
+            Id:
+            <input
+              value={1}
+              onChange={({ target }) => setBookId(target.value)}
+            />
+          </div>
+        ) : (
+          <div></div>
+        )}
         <div>
           Title:
           <input
@@ -47,7 +60,11 @@ export const AddBookForm = ({ addBook }: AddBookFormProps) => {
             onChange={(event) => numbersOnlyOnChange(event, setNewBookPrice)}
           />
         </div>
-        <button type="submit">Add Book</button>
+        {props.isAddBook ? (
+          <button type="submit">Add Book</button>
+        ) : (
+          <button type="submit">Update Book</button>
+        )}
       </form>
     </div>
   );
