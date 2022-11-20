@@ -1,6 +1,10 @@
 import React from "react";
 import { books } from "../data/books";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPreProcessEditCellProps,
+} from "@mui/x-data-grid";
 
 interface BookEntry {
   id: number;
@@ -9,13 +13,17 @@ interface BookEntry {
   price: number;
 }
 
+const isNumbersOnly = (e: string) => {
+  const re = /^[0-9.\b]+$/;
+  return re.test(e);
+};
+
 const numbersOnlyOnChange = (
   e: React.ChangeEvent<HTMLInputElement>,
   setState: Function
 ) => {
   // checks to see if the entered values are numbers (allows floats)
-  const re = /^[0-9.\b]+$/;
-  if (e.target.value === "" || re.test(e.target.value)) {
+  if (e.target.value === "" || isNumbersOnly(e.target.value)) {
     setState(e.target.value);
   }
 };
@@ -51,10 +59,30 @@ export const InventoryPage = () => {
     setBooksList(importedBooks);
   }, []);
 
-  const columns = [
-    { field: "title", headerName: "Title", flex: 1 },
-    { field: "count", headerName: "Count", flex: 1 },
-    { field: "price", headerName: "Price in €", flex: 1 },
+  const columns: GridColDef[] = [
+    { field: "title", headerName: "Title", flex: 1, editable: true },
+    {
+      field: "count",
+      headerName: "Count",
+      flex: 1,
+      editable: true,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        // don't allow the cell to be edited if there are letters in there
+        const hasError = !isNumbersOnly(params.props.value);
+        return { ...params.props, error: hasError };
+      },
+    },
+    {
+      field: "price",
+      headerName: "Price in €",
+      flex: 1,
+      editable: true,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        // don't allow the cell to be edited if there are letters in there
+        const hasError = !isNumbersOnly(params.props.value);
+        return { ...params.props, error: hasError };
+      },
+    },
   ];
 
   return (
@@ -85,7 +113,12 @@ export const InventoryPage = () => {
         <button type="submit">Add Book</button>
       </form>
       <div style={{ flexGrow: 1 }}>
-        <DataGrid rows={booksList} columns={columns} autoHeight />
+        <DataGrid
+          rows={booksList}
+          columns={columns}
+          autoHeight
+          experimentalFeatures={{ newEditingApi: true }}
+        />
       </div>
     </div>
   );
