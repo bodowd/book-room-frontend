@@ -1,16 +1,28 @@
 import React from "react";
 import { numbersOnlyOnChange } from "../utils";
 
+type FormType = "add" | "update" | "delete";
+
 interface BookFormProps {
   mutateBook: Function;
-  isAddBook: boolean;
+  formType: FormType;
 }
+
+const showButtons = (props: BookFormProps) => {
+  if (props.formType === "add") {
+    return <button type="submit">Add Book</button>;
+  } else if (props.formType === "update") {
+    return <button type="submit">Update Book</button>;
+  } else {
+    return <button type="submit">Delete Book</button>;
+  }
+};
 
 export const BookForm = (props: BookFormProps) => {
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
     props.mutateBook({
-      id: 0,
+      id: props.formType === "add" ? 0 : bookId,
       title: newBookTitle,
       count: newBookCount,
       price: newBookPrice,
@@ -28,43 +40,52 @@ export const BookForm = (props: BookFormProps) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        {!props.isAddBook ? (
+        {/* show id field only if it is the update or delete form */}
+        {props.formType !== "add" ? (
           <div>
             Id:
             <input
-              value={1}
+              value={bookId}
               onChange={({ target }) => setBookId(target.value)}
             />
           </div>
         ) : (
           <div></div>
         )}
-        <div>
-          Title:
-          <input
-            value={newBookTitle}
-            onChange={({ target }) => setNewBookTitle(target.value)}
-          />
-        </div>
-        <div>
-          Count:
-          <input
-            value={newBookCount}
-            onChange={(event) => numbersOnlyOnChange(event, setNewBookCount)}
-          />
-        </div>
-        <div>
-          Price (€):
-          <input
-            value={newBookPrice}
-            onChange={(event) => numbersOnlyOnChange(event, setNewBookPrice)}
-          />
-        </div>
-        {props.isAddBook ? (
-          <button type="submit">Add Book</button>
+        <div></div>
+
+        {props.formType !== "delete" ? (
+          <>
+            <div>
+              Title:
+              <input
+                value={newBookTitle}
+                onChange={({ target }) => setNewBookTitle(target.value)}
+              />
+            </div>
+            <div>
+              Count:
+              <input
+                value={newBookCount}
+                onChange={(event) =>
+                  numbersOnlyOnChange(event, setNewBookCount)
+                }
+              />
+            </div>
+            <div>
+              Price (€):
+              <input
+                value={newBookPrice}
+                onChange={(event) =>
+                  numbersOnlyOnChange(event, setNewBookPrice)
+                }
+              />
+            </div>
+          </>
         ) : (
-          <button type="submit">Update Book</button>
+          <div></div>
         )}
+        {showButtons(props)}
       </form>
     </div>
   );

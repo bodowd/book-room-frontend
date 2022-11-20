@@ -13,13 +13,26 @@ export const InventoryPage = () => {
     setBooksList(booksList.concat(newBook));
   };
 
-  const editBook = (entry: BookEntry) => {};
-
-  const hideAddBookButton = () => {
-    setShowAddBookButton(!showAddBookButton);
+  const editBook = (entry: BookEntry) => {
+    const bookOfInterest = booksList.filter(
+      (i) => Number(i.id) === Number(entry.id)
+    );
   };
 
-  const hideUpdateBookButton = () => {
+  const deleteBook = (entry: BookEntry) => {};
+
+  const showOnlyUpdateButton = () => {
+    setShowAddBookButton(!showAddBookButton);
+    setShowDeleteBookButton(!showDeleteBookButton);
+  };
+
+  const showOnlyAddButton = () => {
+    setShowDeleteBookButton(!showDeleteBookButton);
+    setShowUpdateBookButton(!showUpdateBookButton);
+  };
+
+  const showOnlyDeleteButton = () => {
+    setShowAddBookButton(!showAddBookButton);
     setShowUpdateBookButton(!showUpdateBookButton);
   };
 
@@ -27,6 +40,8 @@ export const InventoryPage = () => {
   const [showAddBookButton, setShowAddBookButton] =
     React.useState<boolean>(true);
   const [showUpdateBookButton, setShowUpdateBookButton] =
+    React.useState<boolean>(true);
+  const [showDeleteBookButton, setShowDeleteBookButton] =
     React.useState<boolean>(true);
 
   // React.useEffect(() => {
@@ -42,9 +57,9 @@ export const InventoryPage = () => {
         <Togglable
           buttonLabel="Add a new book"
           cancelButtonLabel="Close adding books form"
-          setHideOthers={hideUpdateBookButton}
+          setHideOthers={showOnlyAddButton}
         >
-          <BookForm mutateBook={addBook} isAddBook={true} />
+          <BookForm mutateBook={addBook} formType={"add"} />
         </Togglable>
       ) : (
         <div></div>
@@ -54,9 +69,21 @@ export const InventoryPage = () => {
         <Togglable
           buttonLabel="Update a book"
           cancelButtonLabel="Close updating books form"
-          setHideOthers={hideAddBookButton}
+          setHideOthers={showOnlyUpdateButton}
         >
-          <BookForm mutateBook={editBook} isAddBook={false} />
+          <BookForm mutateBook={editBook} formType={"update"} />
+        </Togglable>
+      ) : (
+        <div></div>
+      )}
+
+      {showDeleteBookButton ? (
+        <Togglable
+          buttonLabel="Delete a book"
+          cancelButtonLabel="Close deleting books form"
+          setHideOthers={showOnlyDeleteButton}
+        >
+          <BookForm mutateBook={deleteBook} formType={"delete"} />
         </Togglable>
       ) : (
         <div></div>
