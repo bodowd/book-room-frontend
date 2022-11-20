@@ -1,10 +1,6 @@
 import React from "react";
 import { books } from "../data/books";
-import {
-  DataGrid,
-  GridColDef,
-  GridPreProcessEditCellProps,
-} from "@mui/x-data-grid";
+import "./inventory.css";
 
 interface BookEntry {
   id: number;
@@ -59,32 +55,6 @@ export const InventoryPage = () => {
     setBooksList(importedBooks);
   }, []);
 
-  const columns: GridColDef[] = [
-    { field: "title", headerName: "Title", flex: 1, editable: true },
-    {
-      field: "count",
-      headerName: "Count",
-      flex: 1,
-      editable: true,
-      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        // don't allow the cell to be edited if there are letters in there
-        const hasError = !isNumbersOnly(params.props.value);
-        return { ...params.props, error: hasError };
-      },
-    },
-    {
-      field: "price",
-      headerName: "Price in €",
-      flex: 1,
-      editable: true,
-      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
-        // don't allow the cell to be edited if there are letters in there
-        const hasError = !isNumbersOnly(params.props.value);
-        return { ...params.props, error: hasError };
-      },
-    },
-  ];
-
   return (
     <div>
       <h1>Book Room Inventory</h1>
@@ -112,14 +82,24 @@ export const InventoryPage = () => {
         </div>
         <button type="submit">Add Book</button>
       </form>
-      <div style={{ flexGrow: 1 }}>
-        <DataGrid
-          rows={booksList}
-          columns={columns}
-          autoHeight
-          experimentalFeatures={{ newEditingApi: true }}
-        />
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Count</th>
+            <th>Price in €</th>
+          </tr>
+          {booksList.map((i) => (
+            <tr key={i.id}>
+              <td>{i.id}</td>
+              <td>{i.title}</td>
+              <td>{i.count}</td>
+              <td>{i.price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
