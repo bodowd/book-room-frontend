@@ -21,13 +21,17 @@ const showButtons = (props: BookFormProps) => {
 export const BookForm = (props: BookFormProps) => {
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    if (newBookTitle !== "") {
-      props.mutateBook({
-        id: props.formType === "add" ? 0 : bookId,
-        title: newBookTitle,
-        count: newBookCount,
-        price: newBookPrice,
-      });
+    if (props.formType === "delete") {
+      props.mutateBook({ id: bookId });
+    } else {
+      if (newBookTitle !== "") {
+        props.mutateBook({
+          id: props.formType === "add" ? 0 : bookId,
+          title: newBookTitle,
+          count: newBookCount,
+          price: newBookPrice,
+        });
+      }
     }
     setNewBookTitle("");
     setNewBookCount(0);
