@@ -19,7 +19,13 @@ export const InventoryPage = () => {
     );
   };
 
-  const deleteBook = (entry: BookEntry) => {};
+  const deleteBook = (entry: { id: number }) => {
+    console.log(Number(entry.id));
+    const newBooksList = booksList.filter(
+      (i) => Number(i.id) !== Number(entry.id)
+    );
+    setBooksList(newBooksList);
+  };
 
   const showOnlyUpdateButton = () => {
     setShowAddBookButton(!showAddBookButton);
